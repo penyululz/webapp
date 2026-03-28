@@ -7,6 +7,10 @@ function createPortalDetails(mode, note, embedUrl) {
   };
 }
 
+function createLinks(items) {
+  return items.filter((item) => item.href);
+}
+
 export function createApps(env) {
   const isLocalPortal =
     typeof window !== "undefined" &&
@@ -42,9 +46,9 @@ export function createApps(env) {
       kind: "Docker app",
       folder: "F:\\webapp\\immich-app(done)",
       url: immichUrl,
-      links: [
+      links: createLinks([
         { label: "Open app", href: immichUrl, primary: true }
-      ],
+      ]),
       startCommand: "cd \"F:\\webapp\\immich-app(done)\" && docker compose up -d",
       summary: "Self-hosted photo and video management app.",
       note: "The service needs a minute on first boot while Postgres, machine learning, and import jobs settle.",
@@ -79,9 +83,9 @@ export function createApps(env) {
       kind: "Docker app",
       folder: "F:\\webapp\\seafile(done)",
       url: seafileUrl,
-      links: [
+      links: createLinks([
         { label: "Open app", href: seafileUrl, primary: true }
-      ],
+      ]),
       startCommand: "cd \"F:\\webapp\\seafile(done)\" && docker compose up -d",
       summary: "Private file sync and document cloud.",
       note: "This build already has a seeded admin account in docker-compose, so it is ready to sign in.",
@@ -116,9 +120,9 @@ export function createApps(env) {
       kind: "Docker app",
       folder: "F:\\webapp\\stirling-pdf(done)",
       url: stirlingUrl,
-      links: [
+      links: createLinks([
         { label: "Open app", href: stirlingUrl, primary: true }
-      ],
+      ]),
       startCommand: "cd \"F:\\webapp\\stirling-pdf(done)\" && docker compose up -d",
       summary: "PDF toolkit for merge, split, OCR, conversion, and cleanup.",
       note: "The current security-enabled run creates a default admin user and asks you to rotate the password on first sign-in.",
@@ -152,10 +156,10 @@ export function createApps(env) {
       kind: "Docker app",
       folder: "F:\\webapp\\wordpress (done)",
       url: wordpressUrl,
-      links: [
+      links: createLinks([
         { label: "Open site", href: wordpressUrl, primary: true },
         { label: "Open phpMyAdmin", href: phpMyAdminUrl, primary: false }
-      ],
+      ]),
       startCommand: "cd \"F:\\webapp\\wordpress (done)\" && docker compose up -d",
       summary: "CMS project with bundled WordPress files and MariaDB.",
       note: "WordPress is currently on its installation screen, so the next visit should finish site title, admin user, and password setup.",
@@ -192,9 +196,9 @@ export function createApps(env) {
       kind: "Docker app",
       folder: "F:\\webapp\\standardnotes(done)",
       url: standardNotesUrl,
-      links: [
+      links: createLinks([
         { label: "Open app", href: standardNotesUrl, primary: true }
-      ],
+      ]),
       startCommand: "cd \"F:\\webapp\\standardnotes(done)\" && docker compose up -d",
       summary: "Encrypted notes app with a local sync server and a local web client.",
       note: "The local web build is preconfigured to use the local sync server, so account creation stays inside this machine instead of pointing to the public Standard Notes cloud.",
@@ -231,12 +235,12 @@ export function createApps(env) {
       url: whisperxStudioUrl,
       statusUrl: whisperxApiUrl,
       links: whisperxApiUrl
-        ? [
+        ? createLinks([
             { label: "Open app", href: whisperxStudioUrl, primary: true },
             { label: "Open API docs", href: `${whisperxApiUrl}/docs`, primary: false },
             { label: "Open health", href: `${whisperxApiUrl}/health`, primary: false }
-          ]
-        : [{ label: "Open app", href: whisperxStudioUrl, primary: true }],
+          ])
+        : createLinks([{ label: "Open app", href: whisperxStudioUrl, primary: true }]),
       startCommand: "cd \"F:\\webapp\\whisperX (transcription ready linux)\\whisperX\" && docker compose up -d",
       summary: "A standalone WhisperX transcription web app backed by a local CPU-friendly Docker API.",
       note: "The WhisperX app opens on its own page and posts jobs to the local API. Diarization stays optional until you add a Hugging Face token.",

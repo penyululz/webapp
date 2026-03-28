@@ -59,6 +59,10 @@ function getLiveLabel(status) {
     return "Offline";
   }
 
+  if (status === "private") {
+    return "Private";
+  }
+
   return "Checking";
 }
 
@@ -247,11 +251,12 @@ function App() {
     apps[0];
 
   const readyApps = apps.filter((app) => app.status === "ready");
+  const publiclyLinkedReadyApps = readyApps.filter((app) => app.links.length > 0);
   const setupApps = apps.filter((app) => app.status === "setup");
   const sourceApps = apps.filter((app) => app.status === "source");
   const liveNow = readyApps.filter((app) => serviceStatus[app.name] === "online").length;
   const workspaceApps = [...setupApps, ...sourceApps];
-  const readyAppsForHome = [...readyApps].sort((left, right) => {
+  const readyAppsForHome = [...publiclyLinkedReadyApps].sort((left, right) => {
     const leftStatus = serviceStatus[left.name] === "online" ? 0 : 1;
     const rightStatus = serviceStatus[right.name] === "online" ? 0 : 1;
 
@@ -261,7 +266,7 @@ function App() {
 
     return left.name.localeCompare(right.name);
   });
-  const homeCarouselApps = readyAppsForHome.length ? readyAppsForHome : readyApps;
+  const homeCarouselApps = readyAppsForHome.length ? readyAppsForHome : readyApps.filter((app) => app.links.length > 0);
   const homeFeaturedApp =
     homeCarouselApps[featuredSlideIndex % Math.max(homeCarouselApps.length, 1)] || featuredApp;
   const homeFeaturedApps = readyAppsForHome;
@@ -362,7 +367,7 @@ function App() {
             <aside className="hero__panel">
               <div className="status-chip">
                 <span className="status-chip__dot"></span>
-                <span>{liveNow} of {readyApps.length} runnable apps responding right now</span>
+                <span>{liveNow} of {publiclyLinkedReadyApps.length} public apps responding right now</span>
               </div>
 
               <div className="hero__stats">
@@ -609,7 +614,7 @@ function App() {
                       <p className="preview-note">
                         {featuredApp.links.length
                           ? "Use the main action button above to open the real app."
-                          : "This project does not expose a direct browser URL yet."}
+                          : "This app is not publicly linked in this deployment. Use a private route like Tailscale or add a public URL for it."}
                       </p>
                     </div>
                   )}
@@ -687,8 +692,12 @@ function App() {
                             {getStatusLabel(app)}
                           </span>
                           {app.status === "ready" ? (
-                            <span className={`live-status live-status--${serviceStatus[app.name] || "checking"}`}>
-                              {getLiveLabel(serviceStatus[app.name])}
+                            <span
+                              className={`live-status live-status--${
+                                app.links.length ? serviceStatus[app.name] || "checking" : "private"
+                              }`}
+                            >
+                              {getLiveLabel(app.links.length ? serviceStatus[app.name] : "private")}
                             </span>
                           ) : null}
                         </div>
