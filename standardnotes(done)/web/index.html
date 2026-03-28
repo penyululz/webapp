@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="viewport-fit=cover, width=device-width, initial-scale=1" name="viewport" />
+
+    <link rel="canonical" href="http://localhost:3007" />
+
+    <link href="favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+    <link href="favicon/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+    <link href="favicon/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
+    <link href="manifest.webmanifest" rel="manifest" />
+
+    <link color="#5bbad5" href="favicon/safari-pinned-tab.svg" rel="mask-icon" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <meta content="Standard Notes" name="apple-mobile-web-app-title" />
+    <meta content="Standard Notes" name="application-name" />
+    <base href="/" />
+
+    <title>Notes · Standard Notes</title>
+    <meta
+      name="description"
+      content="Standard Notes is an easy-to-use encrypted note-taking app for digitalists and professionals. Capture your notes, documents, and life's work all in one place."
+    />
+
+    <meta content="Standard Notes, an end-to-end encrypted notes app." name="twitter:title" />
+    <meta
+      content="Standard Notes is an easy-to-use encrypted note-taking app for digitalists and professionals. Capture your notes, documents, and life's work all in one place."
+      name="twitter:description"
+    />
+    <meta content="@standardnotes" name="twitter:site" />
+    <meta content="summary" name="twitter:card" />
+
+    <meta content="Standard Notes, an end-to-end encrypted notes app." name="og:title" />
+    <meta
+      content="Standard Notes is an easy-to-use encrypted note-taking app for digitalists and professionals. Capture your notes, documents, and life's work all in one place."
+      name="og:description"
+    />
+
+    <script src="./config.js"></script>
+    <script>
+      const standardNotesConfig = window.STANDARD_NOTES_CONFIG || {};
+
+      window.defaultSyncServer = standardNotesConfig.syncServer || "http://localhost:3004";
+      window.defaultFilesHost = standardNotesConfig.filesHost || window.defaultSyncServer;
+      window.enabledUnfinishedFeatures = false;
+      window.websocketUrl = standardNotesConfig.websocketUrl || "ws://localhost:3129";
+      window.purchaseUrl = "https://standardnotes.com/purchase";
+      window.plansUrl = "https://standardnotes.com/plans";
+      window.dashboardUrl = "https://standardnotes.com/dashboard";
+    </script>
+
+    <script src="./app.js" debug="false"></script>
+    <link rel="stylesheet" media="all" href="./app.css" debug="false" />
+  </head>
+  <body></body>
+</html>

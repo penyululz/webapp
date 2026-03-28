@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhisperX Studio</title>
+    <meta name="theme-color" content="#050505" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="background-media" aria-hidden="true"></div>
+      <div class="background-overlay" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="topbar__inner">
+          <a class="brand" href="./index.html" aria-label="WhisperX Studio home">
+            <img class="brand__logo brand__logo--dark" src="./brand/logo-dark-compact.svg" alt="" />
+            <img class="brand__logo brand__logo--light" src="./brand/logo-light-compact.svg" alt="" />
+            <span class="brand__text">WhisperX Studio</span>
+          </a>
+
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+            <span id="themeIcon" aria-hidden="true"></span>
+          </button>
+        </div>
+      </header>
+
+      <main class="standalone-page">
+        <section class="standalone-hero">
+          <div class="hero-copy">
+            <div class="section-kicker">
+              <span class="section-kicker__line"></span>
+              <span>Transcription app</span>
+            </div>
+
+            <h1 class="standalone-title">WhisperX Studio</h1>
+            <p class="hero__text">
+              Upload audio or video, pick a profile, and send the job straight to your local WhisperX API.
+            </p>
+          </div>
+
+          <div class="standalone-meta">
+            <div class="detail">
+              <span class="meta-label">App URL</span>
+              <span class="meta-value mono">http://localhost:3030</span>
+            </div>
+            <div class="detail">
+              <span class="meta-label">API target</span>
+              <span class="meta-value mono" id="apiTarget">/api</span>
+            </div>
+            <div class="detail">
+              <span class="meta-label">API docs</span>
+              <a class="meta-value mono" id="apiDocsLink" href="/api/docs" target="_blank" rel="noreferrer">/api/docs</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="standalone-shell">
+          <div class="whisperx-studio">
+            <div class="whisperx-studio__hero">
+              <div>
+                <span class="whisperx-chip is-online" id="apiStatus">API target set</span>
+                <h2>Standalone Web App</h2>
+                <p>
+                  This page follows the same visual system as the main portal, while staying usable as its own local app.
+                </p>
+              </div>
+
+              <div class="whisperx-endpoint">
+                <span class="meta-label">Current target</span>
+                <span class="meta-value mono" id="apiTargetCopy">/api</span>
+              </div>
+            </div>
+
+            <div class="whisperx-preset-row">
+              <button class="preset-chip" type="button" data-preset="interview">Interview</button>
+              <button class="preset-chip" type="button" data-preset="podcast">Podcast</button>
+              <button class="preset-chip" type="button" data-preset="draft">Fast draft</button>
+            </div>
+
+            <form class="whisperx-grid" id="whisperxForm">
+              <label class="upload-card" id="uploadCard">
+                <input class="upload-card__input" id="mediaFile" type="file" accept="audio/*,video/*" />
+                <span class="meta-label">Input media</span>
+                <strong id="fileName">Drop audio or video here</strong>
+                <span class="card-note" id="fileMeta">Supports interviews, podcasts, lectures, voice notes, and video clips.</span>
+              </label>
+
+              <div class="studio-card">
+                <span class="meta-label">Transcription settings</span>
+                <div class="studio-fields">
+                  <label>
+                    <span>Language</span>
+                    <select id="language">
+                      <option value="auto">Auto detect</option>
+                      <option value="en">English</option>
+                      <option value="ms">Malay</option>
+                      <option value="zh">Chinese</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Model</span>
+                    <select id="model">
+                      <option value="small">Small</option>
+                      <option value="medium" selected>Medium</option>
+                      <option value="large-v3">Large v3</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Device</span>
+                    <select id="device">
+                      <option value="auto" selected>Auto</option>
+                      <option value="cuda">GPU</option>
+                      <option value="cpu">CPU</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Output</span>
+                    <select id="output">
+                      <option value="srt" selected>SRT</option>
+                      <option value="vtt">VTT</option>
+                      <option value="txt">Plain text</option>
+                      <option value="json">JSON</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="studio-toggles">
+                  <label class="toggle-row">
+                    <input id="diarize" type="checkbox" checked />
+                    <span>Enable speaker diarization</span>
+                  </label>
+
+                  <label class="toggle-row">
+                    <input id="alignment" type="checkbox" checked />
+                    <span>Keep word alignment enabled</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="studio-card">
+                <span class="meta-label">Run plan</span>
+                <div class="plan-list">
+                  <div class="plan-item">
+                    <strong>1. Select source media</strong>
+                    <span id="planFile">No file selected yet</span>
+                  </div>
+                  <div class="plan-item">
+                    <strong>2. Review processing profile</strong>
+                    <span id="planProfile">medium on auto with SRT output</span>
+                  </div>
+                  <div class="plan-item">
+                    <strong>3. Submit job</strong>
+                    <span>This will POST to the local WhisperX API.</span>
+                  </div>
+                </div>
+
+                <button class="button button--primary whisperx-submit" type="submit">Submit Transcription Job</button>
+                <p class="whisperx-banner" id="banner"></p>
+              </div>
+            </form>
+
+            <div class="whisperx-lower">
+              <div class="studio-card">
+                <span class="meta-label">Request preview</span>
+                <pre class="code-preview" id="requestPreview"></pre>
+              </div>
+
+              <div class="studio-card">
+                <span class="meta-label">Queue</span>
+                <div class="queue-list" id="queueList"></div>
+                <p class="card-note" id="queueEmpty">No jobs queued yet. Select a file and submit one from the studio above.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="site-footer__inner">
+          <div class="site-footer__brand">
+            <img class="brand__logo brand__logo--dark" src="./brand/logo-dark-compact.svg" alt="" />
+            <img class="brand__logo brand__logo--light" src="./brand/logo-light-compact.svg" alt="" />
+            <div>
+              <strong>Created by Mohamad Faris Danial</strong>
+              <div class="site-footer__meta-links">
+                <a class="site-footer__text-link" href="https://portfolio-nine-sandy-ysts5ij3xd.vercel.app" target="_blank" rel="noreferrer">Portfolio</a>
+                <a class="site-footer__text-link" href="https://github.com/penyululz" target="_blank" rel="noreferrer">GitHub</a>
+                <a class="site-footer__text-link" href="https://www.linkedin.com/in/mohamad-faris-danial-abdul-malek-497246294" target="_blank" rel="noreferrer">LinkedIn</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+  </html>

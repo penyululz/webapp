@@ -1,0 +1,29 @@
+node_modules
+dist
+.vercel
+
+# Local environment files
+*.env
+!*.env.example
+**/.env
+!**/.env.example
+
+# OS / editor leftovers
+*.lnk
+Thumbs.db
+.DS_Store
+
+# Service runtime data and backups
+immich-app(done)/library/
+immich-app(done)/postgres/
+immich-app(done)/postgres-backup-*/
+
+standardnotes(done)/data/
+standardnotes(done)/logs/
+standardnotes(done)/uploads/
+
+whisperX (transcription ready linux)/whisperX/models/
+whisperX (transcription ready linux)/whisperX/outputs/
+
+# Optional local-only generated assets
+*.log
