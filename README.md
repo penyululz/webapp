@@ -1,174 +1,129 @@
-# Webapp Control Center
+# Webapp Hub
 
-This root folder is now a React + Vite portal that organizes the other projects in the workspace.
-It now uses a cleaner split:
+Webapp Hub is a centralized self-hosted app platform that brings multiple tools into one branded experience. Instead of treating each service as a separate local project, this repo turns them into a single portal with shared navigation, theming, launch flows, and deployment planning.
 
-- `Home` for the landing page
-- `Dashboard` for the operational app view
-- `Workspace` for deployment and project notes
+The project is designed to work as both:
 
-App-specific setup notes and credentials are documented here instead of being shown directly in the UI.
+- a portfolio-ready frontend experience
+- a practical personal control center for self-hosted services
 
-## Run locally
+## What it does
 
-Install dependencies once:
+Webapp Hub provides a unified interface for launching and organizing services such as:
+
+- Immich
+- Seafile
+- Standard Notes
+- Stirling PDF
+- WordPress
+- WhisperX
+
+It also includes a standalone WhisperX web experience so transcription feels like a real product instead of only a backend utility.
+
+## Core ideas
+
+- One branded frontend for multiple self-hosted apps
+- A cleaner portfolio-style experience instead of a generic admin panel
+- Public demo surface plus protected/private app access
+- Deployment-ready architecture for Cloudflare, Vercel, or VPS-based setups
+
+## Stack
+
+- React 18
+- Vite
+- Docker Compose
+- Cloudflare Workers / Tunnel / Access
+- Tailscale
+
+## Project structure
+
+- `src/` contains the main frontend application
+- `public/` contains brand assets, icons, and background media
+- `whisperX (transcription ready linux)/whisperX/` contains the standalone WhisperX service and web app
+- the other app folders contain the Docker-based service integrations
+
+## Local development
+
+Install dependencies:
 
 ```bat
 cmd /c npm install
 ```
 
-Start the frontend:
+Run the frontend:
 
 ```bat
 cmd /c npm run dev
 ```
 
-Or use:
+Or use the launcher:
 
 ```bat
-F:\webapp\start-hub.bat
+start-hub.bat
 ```
 
-The Vite app runs at `http://127.0.0.1:5173` by default.
-
-To start both the React portal and the Docker-backed services together:
-
-```bat
-F:\webapp\start-centralized-webapp.bat
-```
-
-## Build for production
+To build for production:
 
 ```bat
 cmd /c npm run build
 ```
 
-The production output is written to `dist\`.
+## Deployment options
 
-## Deploy to Vercel
+This repo supports two main deployment styles.
 
-Deploy the root `F:\webapp` folder as a Vite project.
+### 1. Free hybrid setup
 
-For the full public stack, read [DEPLOYMENT.md](./DEPLOYMENT.md). The short version is:
+Recommended for personal use and portfolio presentation:
 
-- deploy the portal to Vercel
-- deploy the Docker apps to a Linux VPS with Coolify or Dokploy
-- then point the portal `VITE_*_URL` variables at the public app domains
+- public frontend on Cloudflare Workers static assets
+- local apps exposed with Cloudflare Tunnel
+- protected app access through Cloudflare Access
+- private owner/admin access through Tailscale
 
-If you have public app deployments, add these environment variables in Vercel:
+See [CLOUDFLARE_SETUP.md](./CLOUDFLARE_SETUP.md).
 
-- `VITE_IMMICH_URL`
-- `VITE_SEAFILE_URL`
-- `VITE_STIRLING_URL`
-- `VITE_WORDPRESS_URL`
-- `VITE_PHPMYADMIN_URL`
-- `VITE_STANDARDNOTES_URL`
-- `VITE_STANDARDNOTES_SYNC_URL`
-- `VITE_WHISPERX_URL`
-- `VITE_WHISPERX_API_URL`
+If you do not have a domain yet, use [FREE_LAUNCH.md](./FREE_LAUNCH.md) for the fastest `workers.dev + Tailscale` launch path.
 
-See [.env.example](./.env.example) for the local defaults.
+### 2. VPS / full-service setup
 
-## WhisperX app
+Recommended if you want the services to live on a dedicated server instead of your own machine:
 
-WhisperX now has its own standalone local web app:
+- frontend on Vercel or Cloudflare
+- Docker apps on a Linux VPS
 
-- Web app: `http://localhost:3030`
-- API: `http://localhost:3020`
-- API docs: `http://localhost:3020/docs`
+See [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-The app lets you:
+## Public vs private access model
 
-- select audio or video files
-- choose transcription presets and output format
-- submit jobs to the local WhisperX API
+The intended production model is:
 
-## App notes
+- public hub for project presentation
+- optional public demo app, such as WhisperX
+- protected app access for sensitive services
+- private owner/admin access for maintenance tasks
 
-### Immich
+This gives the project a strong public portfolio presence while keeping personal or admin-sensitive services under control.
 
-- URL: `http://localhost:2283`
-- Start: `cd "F:\webapp\immich-app(done)" && docker compose up -d`
-- First use: create the first account in the browser; that first user becomes admin
-- Extra note: if the page feels slow right after startup, give Postgres and the ML service another minute
+## Security note
 
-### Seafile
+This repository is meant to be public, so production secrets, private credentials, and personal environment files should not be committed.
 
-- URL: `http://localhost:8082`
-- Start: `cd "F:\webapp\seafile(done)" && docker compose up -d`
-- Default admin email: `me@example.com`
-- Default admin password: `asecret`
-- DB root password: `faristest`
+Before publishing a real deployment:
 
-### Stirling PDF
+- use your own environment variables
+- rotate any local development passwords
+- protect sensitive apps behind Cloudflare Access or Tailscale
+- avoid exposing phpMyAdmin or admin-only routes publicly
 
-- URL: `http://localhost:8083`
-- Start: `cd "F:\webapp\stirling-pdf(done)" && docker compose up -d`
-- Default username: `admin`
-- Default password: `stirling`
-- Settings file: `F:\webapp\stirling-pdf(done)\extraConfigs\settings.yml`
-- Note: this app blocks iframe embedding by default
+## Status
 
-### WordPress
+This project is an actively integrated multi-app workspace, not a single standalone SaaS app. Some services are best treated as protected/private infrastructure, while the hub itself is intended to be the polished public-facing layer.
 
-- URL: `http://localhost:8084`
-- phpMyAdmin: `http://localhost:8085`
-- Start: `cd "F:\webapp\wordpress (done)" && docker compose up -d`
-- First use: complete the WordPress install wizard in the browser
-- DB name: `wordpress`
-- DB user: `satusky`
-- DB password: `faristest`
-- DB root password: `faristest`
+## Author
 
-### Standard Notes
+Created by Mohamad Faris Danial
 
-- Web app: `http://localhost:3007`
-- Sync server: `http://localhost:3004`
-- Start: `cd "F:\webapp\standardnotes(done)" && docker compose up -d`
-- Note: the local web build is already wired to the local sync server
-- Deployment note: update `F:\webapp\standardnotes(done)\web\config.js` for your public sync domain
-- DB user: `std_notes_user`
-- DB password: `faristest`
-
-### WhisperX
-
-- Web app: `http://localhost:3030`
-- API: `http://localhost:3020`
-- API docs: `http://localhost:3020/docs`
-- Start: `cd "F:\webapp\whisperX (transcription ready linux)\whisperX" && docker compose up -d`
-- Default runtime: CPU with `int8` compute
-- Optional: add `WHISPERX_HF_TOKEN` later if you want speaker diarization
-
-## New local services
-
-- Standard Notes web app: `http://localhost:3007`
-- Standard Notes sync server: `http://localhost:3004`
-- WhisperX web app: `http://localhost:3030`
-- WhisperX API: `http://localhost:3020`
-- WhisperX API docs: `http://localhost:3020/docs`
-
-The Standard Notes web container is overridden locally so it defaults to your self-hosted sync server and websocket ports instead of the public Standard Notes cloud.
-
-## Important limit
-
-Vercel can host the portal frontend, but it cannot host Immich, Seafile, Stirling PDF, or WordPress themselves. Those still need their own backend/runtime.
-
-## Optional Docker services
-
-If you later install Docker Desktop, you can still use these scripts:
-
-```bat
-F:\webapp\start-services.bat
-F:\webapp\stop-services.bat
-```
-
-## Local service URLs
-
-- Immich: `http://localhost:2283`
-- Seafile: `http://localhost:8082`
-- Stirling PDF: `http://localhost:8083`
-- WordPress: `http://localhost:8084`
-- phpMyAdmin for WordPress: `http://localhost:8085`
-- Standard Notes web app: `http://localhost:3007`
-- Standard Notes sync server: `http://localhost:3004`
-- WhisperX API: `http://localhost:3020`
+- Portfolio: [portfolio-nine-sandy-ysts5ij3xd.vercel.app](https://portfolio-nine-sandy-ysts5ij3xd.vercel.app)
+- GitHub: [github.com/penyululz](https://github.com/penyululz)
+- LinkedIn: [linkedin.com/in/mohamad-faris-danial-abdul-malek-497246294](https://www.linkedin.com/in/mohamad-faris-danial-abdul-malek-497246294)

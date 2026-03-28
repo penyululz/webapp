@@ -1,0 +1,23 @@
+tunnel: REPLACE_WITH_TUNNEL_ID
+credentials-file: /etc/cloudflared/REPLACE_WITH_TUNNEL_ID.json
+
+ingress:
+  - hostname: whisper.example.com
+    service: http://localhost:3030
+  - hostname: whisper-api.example.com
+    service: http://localhost:3020
+  - hostname: immich.example.com
+    service: http://localhost:2283
+  - hostname: files.example.com
+    service: http://localhost:8082
+  - hostname: pdf.example.com
+    service: http://localhost:8083
+  - hostname: wp.example.com
+    service: http://localhost:8084
+  - hostname: pma.example.com
+    service: http://localhost:8085
+  - hostname: notes.example.com
+    service: http://localhost:3007
+  - hostname: notes-api.example.com
+    service: http://localhost:3004
+  - service: http_status:404

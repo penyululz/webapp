@@ -1,207 +1,104 @@
 # Deployment Guide
 
-This project deploys cleanly when split into two parts:
+This file documents the server-hosted deployment model for Webapp Hub.
 
-1. `F:\webapp` portal frontend on Vercel
-2. Docker app stacks on a Linux VPS with Coolify or Dokploy
+Use this path if you want the app stack to live on a VPS instead of your own machine.
 
 ## Recommended architecture
 
-Use one public domain for the portal and separate subdomains for the heavy apps:
+- public frontend on Vercel or Cloudflare
+- Docker services on a Linux VPS
+- optional reverse proxy / app manager such as Coolify or Dokploy
 
-- `hub.example.com` -> React + Vite portal on Vercel
+Example domain layout:
+
+- `hub.example.com` -> Webapp Hub frontend
 - `immich.example.com` -> Immich
 - `files.example.com` -> Seafile
 - `pdf.example.com` -> Stirling PDF
-- `blog.example.com` -> WordPress
 - `notes.example.com` -> Standard Notes web
 - `notes-api.example.com` -> Standard Notes sync server
 - `whisper.example.com` -> WhisperX web
 - `whisper-api.example.com` -> WhisperX API
 
-Do not publish phpMyAdmin publicly unless you protect it behind access controls.
+## Best fit
 
-## Best host choice
+Choose this path when:
 
-For the Docker apps, use one of:
+- you want the services online even when your own PC is off
+- you want a cleaner production environment
+- you are ready to manage a server or use a tool like Coolify
 
-- Coolify
-- Dokploy
-- A plain Linux VPS with Docker Compose and a reverse proxy
+## Frontend deploy
 
-Coolify and Dokploy are the easiest because they handle domains, SSL, restarts, and env vars without extra glue.
+The frontend can be hosted on:
 
-## Portal on Vercel
+- Vercel
+- Cloudflare Workers static assets
 
-Deploy the root folder `F:\webapp` to Vercel as a Vite project.
+Set the public service URLs with the `VITE_*` environment variables before building.
 
-Build settings:
+## Docker service deploy
 
-- Install command: `npm install`
-- Build command: `npm run build`
-- Output directory: `dist`
+The included service folders can be deployed as separate Compose-based apps on a VPS.
 
-Set these environment variables in Vercel to point the portal at your public app URLs:
+Main considerations:
 
-- `VITE_IMMICH_URL=https://immich.example.com`
-- `VITE_SEAFILE_URL=https://files.example.com`
-- `VITE_STIRLING_URL=https://pdf.example.com`
-- `VITE_WORDPRESS_URL=https://blog.example.com`
-- `VITE_STANDARDNOTES_URL=https://notes.example.com`
-- `VITE_STANDARDNOTES_SYNC_URL=https://notes-api.example.com`
-- `VITE_WHISPERX_URL=https://whisper.example.com`
-- `VITE_WHISPERX_API_URL=https://whisper-api.example.com`
+- persistent storage for app data
+- HTTPS on every public service
+- strong passwords and rotated secrets
+- protected admin routes
+- service-specific hostname config where required
 
-`VITE_PHPMYADMIN_URL` should usually be left unset for public deployments.
-
-## Docker apps on VPS
-
-Use the existing Compose folders from this repo as separate services/apps in Coolify or Dokploy.
+## App-specific notes
 
 ### Immich
 
-Folder:
-
-- `F:\webapp\immich-app(done)`
-
-Important env:
-
-- `IMMICH_HTTP_PORT`
-
-Notes:
-
-- Keep persistent storage for `UPLOAD_LOCATION`
-- Keep persistent storage for `DB_DATA_LOCATION`
-- Give this service enough RAM
+- needs persistent storage
+- benefits from more RAM than the lighter services
+- best kept protected unless you explicitly want public remote access
 
 ### Seafile
 
-Folder:
-
-- `F:\webapp\seafile(done)`
-
-Important env:
-
-- `SEAFILE_HTTP_PORT`
-- `SEAFILE_DB_ROOT_PASSWORD`
-- `SEAFILE_ADMIN_EMAIL`
-- `SEAFILE_ADMIN_PASSWORD`
-- `SEAFILE_SERVER_HOSTNAME`
-- `SEAFILE_SERVER_LETSENCRYPT`
-- `SEAFILE_TIME_ZONE`
-
-Notes:
-
-- `SEAFILE_SERVER_HOSTNAME` must be your real public hostname in production
-- The current compose file still uses host-mounted `/opt/...` paths, so set those up on the server before first boot
+- requires correct public hostname configuration in production
+- should run behind HTTPS
 
 ### Stirling PDF
 
-Folder:
-
-- `F:\webapp\stirling-pdf(done)`
-
-Important env:
-
-- `STIRLING_HTTP_PORT`
-
-Notes:
-
-- If you want login/security in production, enable the security settings instead of keeping the current lightweight local mode
+- can be public or protected depending on your use case
+- consider enabling stronger security settings for production
 
 ### WordPress
 
-Folder:
-
-- `F:\webapp\wordpress (done)`
-
-Important env:
-
-- `WORDPRESS_HTTP_PORT`
-- `WORDPRESS_PHPMYADMIN_PORT`
-
-Notes:
-
-- Do not expose phpMyAdmin publicly unless protected
-- Complete the WordPress install wizard after first deploy
+- public site can be exposed
+- admin access should stay protected
+- phpMyAdmin should stay private
 
 ### Standard Notes
 
-Folder:
-
-- `F:\webapp\standardnotes(done)`
-
-Important env:
-
-- `STANDARDNOTES_WEB_PORT`
-- `STANDARDNOTES_SERVER_PORT`
-- `STANDARDNOTES_WS_PORT`
-
-Important files:
-
-- `F:\webapp\standardnotes(done)\web\config.js`
-- `F:\webapp\standardnotes(done)\web\config.example.js`
-
-Before production, replace `web\config.js` with production values like:
-
-```js
-window.STANDARD_NOTES_CONFIG = {
-  syncServer: "https://notes-api.example.com",
-  filesHost: "https://notes-api.example.com",
-  websocketUrl: "wss://notes-api.example.com"
-};
-```
-
-Notes:
-
-- The local `localhost` Standard Notes config will not work online
-- The app now supports a simple runtime config file so you can deploy cleanly without editing the bundled app each time
+- requires correct sync/web configuration for production domains
+- should be protected because it stores sensitive personal content
 
 ### WhisperX
 
-Folder:
+- can work well as a public demo app
+- private mode is still better if uploaded media is sensitive
 
-- `F:\webapp\whisperX (transcription ready linux)\whisperX`
+## Production checklist
 
-Important env:
+- HTTPS enabled
+- public hostnames configured correctly
+- persistent volumes mounted
+- development secrets rotated
+- sensitive apps behind auth
+- admin tools not exposed publicly
 
-- `WHISPERX_WEB_PORT`
-- `WHISPERX_API_PORT`
-- `WHISPERX_HF_TOKEN`
+## Recommendation
 
-Notes:
+For portfolio use, the best practical split is often:
 
-- The web app already uses same-origin `/api`, so it is deployment-friendly
-- Add `WHISPERX_HF_TOKEN` only if you want diarization support
-- CPU mode works, but GPU-backed deployment is much better if your server supports it
+- public frontend
+- optional public WhisperX demo
+- protected/private access for sensitive services
 
-## Deployment order
-
-1. Deploy the Docker apps on the VPS first
-2. Confirm each app works on its public domain
-3. Put the final public URLs into Vercel env vars
-4. Deploy the portal
-5. Verify every `Open app` link from the portal
-
-## Post-deploy checklist
-
-- Each app has HTTPS
-- Each app has persistent storage
-- Seafile hostname matches the public domain
-- Standard Notes `web/config.js` points to the public sync server
-- WhisperX web can reach `/api/health`
-- Portal buttons open public domains instead of `localhost`
-- Admin passwords are rotated away from local defaults
-
-## What should stay private
-
-These should be private or behind auth even if the portal is public:
-
-- phpMyAdmin
-- database ports
-- admin backends you do not need public
-
-The safest pattern is:
-
-- public portal on Vercel
-- private Docker services behind login, Cloudflare Access, Tailscale, or VPN if this is a personal stack
+That gives you a strong public showcase without turning your personal infrastructure into an openly exposed stack.

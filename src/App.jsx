@@ -82,6 +82,18 @@ function getPortalModeLabel(mode) {
   return "Placeholder";
 }
 
+function getAccessLabel(access) {
+  if (access === "protected") {
+    return "Protected";
+  }
+
+  if (access === "public") {
+    return "Public demo";
+  }
+
+  return "Source only";
+}
+
 function getUrlTagLabel(url) {
   if (!url) {
     return "No local URL yet";
@@ -115,6 +127,7 @@ function AppLogo({ app, size = "normal", theme = "dark" }) {
 }
 
 function App() {
+  const adminLoginUrl = import.meta.env.VITE_ADMIN_LOGIN_URL || "";
   const [theme, setTheme] = useState("dark");
   const [activePage, setActivePage] = useState(() => resolvePage(window.location.hash));
   const [activeFilter, setActiveFilter] = useState("all");
@@ -338,6 +351,11 @@ function App() {
                 <button className="button button--secondary" type="button" onClick={() => goToPage("workspace")}>
                   View Workspace
                 </button>
+                {adminLoginUrl ? (
+                  <a className="button button--secondary" href={adminLoginUrl} target="_blank" rel="noreferrer">
+                    Admin Login
+                  </a>
+                ) : null}
               </div>
             </div>
 
@@ -399,6 +417,7 @@ function App() {
                 <div className="feature-surface__meta">
                   <span className="tag">{homeFeaturedApp.category}</span>
                   <span className="tag">{getUrlTagLabel(homeFeaturedApp.url)}</span>
+                  <span className="tag">{getAccessLabel(homeFeaturedApp.access)}</span>
                   <span className={`card-status card-status--${homeFeaturedApp.status}`}>
                     {getStatusLabel(homeFeaturedApp)}
                   </span>
@@ -470,6 +489,7 @@ function App() {
                     </div>
                   </div>
                   <div className="quick-card__meta">
+                    <span className="tag">{getAccessLabel(app.access)}</span>
                     <span className={`live-status live-status--${serviceStatus[app.name] || "checking"}`}>
                       {getLiveLabel(serviceStatus[app.name])}
                     </span>
@@ -612,20 +632,24 @@ function App() {
                       <span className="meta-value">{featuredApp.category}</span>
                     </div>
                     <div className="detail">
+                      <span className="meta-label">Access</span>
+                      <span className="meta-value">{getAccessLabel(featuredApp.access)}</span>
+                    </div>
+                    <div className="detail">
                       <span className="meta-label">Type</span>
                       <span className="meta-value">
-                      {featuredApp.kind}
-                    </span>
-                  </div>
-                  <div className="detail">
-                    <span className="meta-label">Stack</span>
-                    <div className="tag-row">
-                      {featuredApp.stack.map((item) => (
-                        <span className="tag" key={`${featuredApp.id}-${item}`}>{item}</span>
-                      ))}
+                        {featuredApp.kind}
+                      </span>
+                    </div>
+                    <div className="detail">
+                      <span className="meta-label">Stack</span>
+                      <div className="tag-row">
+                        {featuredApp.stack.map((item) => (
+                          <span className="tag" key={`${featuredApp.id}-${item}`}>{item}</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
               </aside>
             </div>
           </section>
@@ -674,6 +698,7 @@ function App() {
                       <div className="tag-row">
                         <span className="tag">{app.category}</span>
                         <span className="tag">{getUrlTagLabel(app.url)}</span>
+                        <span className="tag">{getAccessLabel(app.access)}</span>
                       </div>
 
                       <div className="action-row">
@@ -733,16 +758,16 @@ function App() {
           </article>
 
           <article className="info-card">
-            <span className="meta-label">Vercel</span>
+            <span className="meta-label">Cloudflare</span>
             <p>
-              Deploy the root folder as a Vite project. Add `VITE_IMMICH_URL`, `VITE_SEAFILE_URL`, `VITE_STIRLING_URL`, `VITE_WORDPRESS_URL`, `VITE_PHPMYADMIN_URL`, `VITE_STANDARDNOTES_URL`, `VITE_STANDARDNOTES_SYNC_URL`, and `VITE_WHISPERX_API_URL` if you have public services.
+              Host the public frontend on Cloudflare Workers static assets, expose local services with Cloudflare Tunnel, and protect the real apps with Cloudflare Access.
             </p>
           </article>
 
           <article className="info-card">
-            <span className="meta-label">Reality check</span>
+            <span className="meta-label">Admin access</span>
             <p>
-              Vercel can host the portal frontend, but the real services still need their own backend runtime.
+              Keep the public hub open, then put the real services behind an admin login so only you or approved reviewers can reach them.
             </p>
           </article>
         </div>

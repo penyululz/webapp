@@ -8,21 +8,33 @@ function createPortalDetails(mode, note, embedUrl) {
 }
 
 export function createApps(env) {
-  const portalOrigin = typeof window !== "undefined" ? window.location.origin : "";
-  const immichUrl = env.VITE_IMMICH_URL || "http://localhost:2283";
-  const seafileUrl = env.VITE_SEAFILE_URL || "http://localhost:8082";
-  const stirlingUrl = env.VITE_STIRLING_URL || "http://localhost:8083";
-  const wordpressUrl = env.VITE_WORDPRESS_URL || "http://localhost:8084";
-  const phpMyAdminUrl = env.VITE_PHPMYADMIN_URL || "http://localhost:8085";
-  const standardNotesUrl = env.VITE_STANDARDNOTES_URL || "http://localhost:3007";
-  const standardNotesSyncUrl = env.VITE_STANDARDNOTES_SYNC_URL || "http://localhost:3004";
-  const whisperxApiUrl = env.VITE_WHISPERX_API_URL || "http://localhost:3020";
-  const whisperxStudioUrl = env.VITE_WHISPERX_URL || "http://localhost:3030";
+  const isLocalPortal =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+  function resolveAppUrl(envValue, localValue) {
+    if (envValue) {
+      return envValue;
+    }
+
+    return isLocalPortal ? localValue : "";
+  }
+
+  const immichUrl = resolveAppUrl(env.VITE_IMMICH_URL, "http://localhost:2283");
+  const seafileUrl = resolveAppUrl(env.VITE_SEAFILE_URL, "http://localhost:8082");
+  const stirlingUrl = resolveAppUrl(env.VITE_STIRLING_URL, "http://localhost:8083");
+  const wordpressUrl = resolveAppUrl(env.VITE_WORDPRESS_URL, "http://localhost:8084");
+  const phpMyAdminUrl = resolveAppUrl(env.VITE_PHPMYADMIN_URL, "http://localhost:8085");
+  const standardNotesUrl = resolveAppUrl(env.VITE_STANDARDNOTES_URL, "http://localhost:3007");
+  const standardNotesSyncUrl = resolveAppUrl(env.VITE_STANDARDNOTES_SYNC_URL, "http://localhost:3004");
+  const whisperxApiUrl = resolveAppUrl(env.VITE_WHISPERX_API_URL, "http://localhost:3020");
+  const whisperxStudioUrl = resolveAppUrl(env.VITE_WHISPERX_URL, "http://localhost:3030");
 
   return [
     {
       id: "immich",
       name: "Immich",
+      access: "protected",
       useHubBrand: true,
       logo: "/app-logos/immich.svg",
       status: "ready",
@@ -59,6 +71,7 @@ export function createApps(env) {
     {
       id: "seafile",
       name: "Seafile",
+      access: "protected",
       useHubBrand: true,
       logo: "/app-logos/seafile.svg",
       status: "ready",
@@ -95,6 +108,7 @@ export function createApps(env) {
     {
       id: "stirling-pdf",
       name: "Stirling PDF",
+      access: "protected",
       useHubBrand: true,
       logo: "/app-logos/stirling.png",
       status: "ready",
@@ -130,6 +144,7 @@ export function createApps(env) {
     {
       id: "wordpress",
       name: "WordPress",
+      access: "protected",
       useHubBrand: true,
       logo: "/app-logos/wordpress.svg",
       status: "ready",
@@ -169,6 +184,7 @@ export function createApps(env) {
     {
       id: "standard-notes",
       name: "Standard Notes",
+      access: "protected",
       useHubBrand: true,
       logo: "/app-logos/standardnotes.png",
       status: "ready",
@@ -205,6 +221,7 @@ export function createApps(env) {
     {
       id: "whisperx",
       name: "WhisperX",
+      access: "public",
       useHubBrand: true,
       logo: "/app-logos/whisperx.svg",
       status: "ready",
@@ -241,6 +258,7 @@ export function createApps(env) {
     {
       id: "go-mail",
       name: "go-mail",
+      access: "source",
       logo: "/app-logos/go.svg",
       status: "source",
       category: "Backend",
