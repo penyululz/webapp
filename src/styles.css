@@ -401,12 +401,16 @@ main {
 .hero-media {
   z-index: -2;
   overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(5, 5, 5, 0.24), rgba(5, 5, 5, 0.24)),
+    url("/hub-assets/hero-wallpaper.jpg") center center / cover no-repeat;
 }
 
 .hero-media__video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .hero-media__overlay {

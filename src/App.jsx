@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createApps } from "./apps";
 import { BrandLogo, ThemeIcon } from "./Branding";
 
@@ -132,6 +132,7 @@ function AppLogo({ app, size = "normal", theme = "dark" }) {
 
 function App() {
   const adminLoginUrl = import.meta.env.VITE_ADMIN_LOGIN_URL || "";
+  const heroVideoRef = useRef(null);
   const [theme, setTheme] = useState("dark");
   const [activePage, setActivePage] = useState(() => resolvePage(window.location.hash));
   const [activeFilter, setActiveFilter] = useState("all");
@@ -157,6 +158,22 @@ function App() {
       themeColorMeta.setAttribute("content", theme === "dark" ? "#050505" : "#fafafa");
     }
   }, [theme]);
+
+  useEffect(() => {
+    if (activePage !== "home") {
+      return;
+    }
+
+    const video = heroVideoRef.current;
+    if (!video) {
+      return;
+    }
+
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  }, [activePage, theme]);
 
   useEffect(() => {
     function handleHashChange() {
@@ -311,12 +328,15 @@ function App() {
         <section className="hero hero--landing" id="home">
           <div className="hero-media" aria-hidden="true">
             <video
+              ref={heroVideoRef}
               key={theme}
               autoPlay
               muted
               loop
               playsInline
               preload="auto"
+              poster="/hub-assets/hero-wallpaper.jpg"
+              disableRemotePlayback
               className="hero-media__video"
             >
               <source
