@@ -134,6 +134,7 @@ function App() {
   const adminLoginUrl = import.meta.env.VITE_ADMIN_LOGIN_URL || "";
   const heroVideoRef = useRef(null);
   const [theme, setTheme] = useState("dark");
+  const [heroVideoActive, setHeroVideoActive] = useState(false);
   const [activePage, setActivePage] = useState(() => resolvePage(window.location.hash));
   const [activeFilter, setActiveFilter] = useState("all");
   const [query, setQuery] = useState("");
@@ -169,10 +170,20 @@ function App() {
       return;
     }
 
+    setHeroVideoActive(false);
+
+    const fallbackTimer = window.setTimeout(() => {
+      setHeroVideoActive(!video.paused && !video.ended);
+    }, 2200);
+
     const playPromise = video.play();
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch(() => {});
     }
+
+    return () => {
+      window.clearTimeout(fallbackTimer);
+    };
   }, [activePage, theme]);
 
   useEffect(() => {
@@ -326,7 +337,7 @@ function App() {
     return (
       <>
         <section className="hero hero--landing" id="home">
-          <div className="hero-media" aria-hidden="true">
+          <div className={`hero-media ${heroVideoActive ? "is-video-active" : "is-video-fallback"}`} aria-hidden="true">
             <video
               ref={heroVideoRef}
               key={theme}
@@ -338,6 +349,10 @@ function App() {
               poster="/hub-assets/hero-wallpaper.jpg"
               disableRemotePlayback
               className="hero-media__video"
+              onPlaying={() => setHeroVideoActive(true)}
+              onPause={() => setHeroVideoActive(false)}
+              onStalled={() => setHeroVideoActive(false)}
+              onError={() => setHeroVideoActive(false)}
             >
               <source
                 src={
